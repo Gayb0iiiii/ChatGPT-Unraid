@@ -1,4 +1,3 @@
-backend/app.py
 import os
 import openai
 import subprocess
@@ -10,11 +9,13 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app = Flask(__name__)
 
+
 def run_cmd(cmd):
     try:
         return subprocess.run(cmd, shell=True, capture_output=True, check=True).stdout.decode()
     except subprocess.CalledProcessError as e:
         return f"Error running '{cmd}': {e.stderr.decode()}"
+
 
 def get_system_context():
     return {
@@ -25,6 +26,7 @@ def get_system_context():
         "docker": get_all_docker_logs()
     }
 
+
 def get_all_docker_logs():
     logs = ""
     containers = run_cmd("docker ps --format '{{.Names}}'").splitlines()
@@ -32,6 +34,7 @@ def get_all_docker_logs():
         log = run_cmd(f"docker logs --tail 100 {name}")
         logs += f"Logs for {name}:\n{log}\n"
     return logs
+
 
 def build_prompt(user_input, context):
     return f"""User question: "{user_input}"
@@ -43,8 +46,7 @@ System state summary:
 - Docker container logs: {context['docker']}
 - System logs (last 200 lines): {context['syslog']}
 
-Respond like a system assistant for Unraid with insight from the above logs.
-"""
+Respond like a system assistant for Unraid with insight from the above logs."""
 
 
 @app.route("/ask", methods=["POST"])
@@ -90,12 +92,8 @@ def stream():
                 delta = chunk['choices'][0]['delta']
                 if "content" in delta:
                     yield f"data: {delta['content']}\n\n"
-
-"
         except Exception as e:
-            yield f"data: [ERROR] {str(e)}
-
-"
+            yield f"data: [ERROR] {str(e)}\n\n"
 
     return Response(generate(), content_type='text/event-stream')
 
