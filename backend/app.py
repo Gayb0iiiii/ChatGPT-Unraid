@@ -32,9 +32,7 @@ def get_all_docker_logs():
     containers = run_cmd("docker ps --format '{{.Names}}'").splitlines()
     for name in containers:
         log = run_cmd(f"docker logs --tail 100 {name}")
-        logs += f"Logs for {name}:
-{log}
-"
+        logs += f"Logs for {name}:\n{log}\n"
     return logs
 
 
@@ -97,13 +95,9 @@ def stream():
             )
             for chunk in stream:
                 if chunk.choices[0].delta.content:
-                    yield f"data: {chunk.choices[0].delta.content}
-
-"
+                    yield f"data: {chunk.choices[0].delta.content}\n\n"
         except Exception as e:
-            yield f"data: [ERROR] {str(e)}
-
-"
+            yield f"data: [ERROR] {str(e)}\n\n"
 
     return Response(generate(), content_type='text/event-stream')
 
