@@ -1,4 +1,4 @@
-# backend/app.py
+backend/app.py
 import os
 import openai
 import subprocess
