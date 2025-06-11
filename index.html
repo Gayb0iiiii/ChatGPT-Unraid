@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Unraid ChatGPT Assistant</title>
+</head>
+<body>
+  <h2>Unraid ChatGPT Assistant</h2>
+  <input type="text" id="question" placeholder="Type your question..." style="width: 60%;">
+  <button onclick="ask()">Ask</button>
+  <pre id="response" style="margin-top:20px; background:#f0f0f0; padding:10px;"></pre>
+
+  <script>
+    function ask() {
+      const question = document.getElementById('question').value;
+      const output = document.getElementById('response');
+      output.textContent = '';
+
+      const eventSource = new EventSource(`/ask/stream?question=${encodeURIComponent(question)}`);
+      eventSource.onmessage = function(event) {
+        output.textContent += event.data;
+      };
+      eventSource.onerror = function() {
+        output.textContent += "\n[ERROR] Stream closed.";
+        eventSource.close();
+      };
+    }
+  </script>
+</body>
+</html>
