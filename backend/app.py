@@ -89,7 +89,7 @@ def stream():
             for chunk in response:
                 delta = chunk['choices'][0]['delta']
                 if "content" in delta:
-                    yield f"data: {delta['content']}
+                    yield f"data: {delta['content']}\n\n"
 
 "
         except Exception as e:
