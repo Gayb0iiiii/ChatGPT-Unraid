@@ -1,11 +1,11 @@
 import os
-import openai
 import subprocess
 from flask import Flask, request, jsonify, Response
 from dotenv import load_dotenv
+from openai import OpenAI
 
 load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 app = Flask(__name__)
 
@@ -60,10 +60,10 @@ def ask():
     prompt = build_prompt(question, context)
 
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4",
             messages=[{"role": "user", "content": prompt}],
-            temperature=0.5,
+            temperature=0.5
         )
         answer = response.choices[0].message.content
         return jsonify({"response": answer})
@@ -82,16 +82,15 @@ def stream():
 
     def generate():
         try:
-            response = openai.ChatCompletion.create(
+            stream = client.chat.completions.create(
                 model="gpt-4",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.5,
                 stream=True
             )
-            for chunk in response:
-                delta = chunk['choices'][0]['delta']
-                if "content" in delta:
-                    yield f"data: {delta['content']}\n\n"
+            for chunk in stream:
+                if chunk.choices[0].delta.content:
+                    yield f"data: {chunk.choices[0].delta.content}\n\n"
         except Exception as e:
             yield f"data: [ERROR] {str(e)}\n\n"
 
