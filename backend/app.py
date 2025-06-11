@@ -30,9 +30,7 @@ def get_all_docker_logs():
     containers = run_cmd("docker ps --format '{{.Names}}'").splitlines()
     for name in containers:
         log = run_cmd(f"docker logs --tail 100 {name}")
-        logs += f"Logs for {name}:
-{log}
-"
+        logs += f"Logs for {name}:\n{log}\n"
     return logs
 
 def build_prompt(user_input, context):
