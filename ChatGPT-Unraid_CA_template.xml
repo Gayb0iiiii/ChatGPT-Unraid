@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<Container>
+  <Name>ChatGPT-Unraid-Assistant</Name>
+  <Repository>sweatyboi/unraidgpt-assistant</Repository>
+  <Registry>https://hub.docker.com/r/sweatyboi/unraidgpt-assistant</Registry>
+  <Network>bridge</Network>
+  <Privileged>false</Privileged>
+  <WebUI>http://[IP]:[PORT:5000]/</WebUI>
+  <Icon>https://raw.githubusercontent.com/Gayb0iiiii/ChatGPT-Unraid/main/icon.png</Icon>
+
+  <Environment>
+    <Variable>
+      <Name>OPENAI_API_KEY</Name>
+      <Value></Value>
+      <Description>Your OpenAI API key (required)</Description>
+      <Required>true</Required>
+      <Mask>true</Mask>
+    </Variable>
+    <Variable>
+      <Name>INSTRUCTIONS</Name>
+      <Value></Value>
+      <Description>Optional system instructions for GPT-4o (overrides default prompt)</Description>
+      <Required>false</Required>
+      <Mask>false</Mask>
+    </Variable>
+  </Environment>
+
+  <Port>
+    <HostPort>5000</HostPort>
+    <ContainerPort>5000</ContainerPort>
+    <Protocol>tcp</Protocol>
+  </Port>
+
+  <Volume>
+    <HostDir>/var/run/docker.sock</HostDir>
+    <ContainerDir>/var/run/docker.sock</ContainerDir>
+    <Mode>ro</Mode>
+  </Volume>
+
+  <Volume>
+    <HostDir>/var/log</HostDir>
+    <ContainerDir>/var/log</ContainerDir>
+    <Mode>ro</Mode>
+  </Volume>
+
+  <Category>Tools:System</Category>
+  <Support>https://github.com/Gayb0iiiii/ChatGPT-Unraid</Support>
+  <Project>https://github.com/Gayb0iiiii/ChatGPT-Unraid</Project>
+  <Description>ChatGPT-powered Unraid assistant using GPT-4o. Offers system log analysis, diagnostics, and intelligent responses. Supports image uploads, mobile UI, and customizable backend prompts.</Description>
+</Container>
