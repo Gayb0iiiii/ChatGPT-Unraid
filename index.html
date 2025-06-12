@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Unraid Assistant</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    textarea, input[type="text"] {
+      width: 100%;
+      padding: 0.75rem;
+      margin: 0.5rem 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #007bff;
+      border: none;
+      color: white;
+      font-size: 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #response {
+      white-space: pre-wrap;
+      background: white;
+      margin-top: 1rem;
+      padding: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .preview-img {
+      max-width: 100%;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Unraid Chat Assistant</h1>
+    <label>System Instructions:</label>
+    <textarea id="instructions" rows="2" placeholder="e.g. Respond like a Linux admin..."></textarea>
+
+    <label>Your Question:</label>
+    <input type="text" id="question" placeholder="Ask something about your system..." />
+
+    <label>Optional Image (e.g. screenshot):</label>
+    <input type="file" id="image" accept="image/*" />
+
+    <button onclick="ask()">Send</button>
+
+    <pre id="response"></pre>
+    <img id="preview" class="preview-img" />
+  </div>
+
+  <script>
+    function ask() {
+      const question = document.getElementById('question').value;
+      const instructions = document.getElementById('instructions').value;
+      const fileInput = document.getElementById('image');
+      const output = document.getElementById('response');
+      const preview = document.getElementById('preview');
+
+      output.textContent = '';
+      preview.src = '';
+
+      const formData = new FormData();
+      formData.append("question", question);
+      formData.append("instructions", instructions);
+      if (fileInput.files.length > 0) {
+        formData.append("image", fileInput.files[0]);
+        const reader = new FileReader();
+        reader.onload = () => preview.src = reader.result;
+        reader.readAsDataURL(fileInput.files[0]);
+      }
+
+      fetch("/ask/image", {
+        method: "POST",
+        body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+        output.textContent = data.response || data.error;
+      })
+      .catch(err => {
+        output.textContent = "[ERROR] " + err;
+      });
+    }
+  </script>
+</body>
+</html>
