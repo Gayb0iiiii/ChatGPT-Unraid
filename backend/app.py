@@ -1,4 +1,3 @@
-
 from flask import Flask, request, jsonify
 import openai
 import os
@@ -30,7 +29,7 @@ def chat():
 
     try:
         response = openai.ChatCompletion.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": SYSTEM_INSTRUCTIONS},
                 {"role": "user", "content": user_input}
