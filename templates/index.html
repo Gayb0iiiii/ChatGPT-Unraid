@@ -2,109 +2,129 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Unraid Assistant</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unraid GPT Assistant</title>
   <style>
+    :root {
+      --bg-color: #f3f4f6;
+      --text-color: #111827;
+      --header-bg: #111827;
+      --header-text: white;
+      --button-bg: #2563eb;
+      --button-hover: #1d4ed8;
+      --output-bg: #fff;
+    }
+
+    [data-theme="dark"] {
+      --bg-color: #1f2937;
+      --text-color: #f3f4f6;
+      --header-bg: #000;
+      --header-text: #f3f4f6;
+      --button-bg: #4f46e5;
+      --button-hover: #4338ca;
+      --output-bg: #374151;
+    }
+
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f5f5f5;
+      font-family: sans-serif;
       margin: 0;
       padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background-color: var(--bg-color);
+      color: var(--text-color);
     }
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 2rem;
-    }
-    h1 {
+    header {
+      background-color: var(--header-bg);
+      color: var(--header-text);
+      padding: 1rem;
       text-align: center;
-      color: #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    textarea, input[type="text"] {
+    main {
+      flex: 1;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      overflow-y: auto;
+    }
+    textarea {
       width: 100%;
-      padding: 0.75rem;
-      margin: 0.5rem 0;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 1rem;
+      height: 80px;
+      padding: 0.5rem;
+      resize: none;
+    }
+    .output {
+      white-space: pre-wrap;
+      background-color: var(--output-bg);
+      padding: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 0.5rem;
+    }
+    footer {
+      padding: 1rem;
+      border-top: 1px solid #ddd;
+      background-color: var(--output-bg);
+    }
+    input[type="file"] {
+      margin-top: 0.5rem;
     }
     button {
-      width: 100%;
-      padding: 0.75rem;
-      background-color: #007bff;
-      border: none;
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      background-color: var(--button-bg);
       color: white;
-      font-size: 1rem;
-      border-radius: 5px;
+      border: none;
+      border-radius: 0.25rem;
       cursor: pointer;
     }
     button:hover {
-      background-color: #0056b3;
-    }
-    #response {
-      white-space: pre-wrap;
-      background: white;
-      margin-top: 1rem;
-      padding: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    .preview-img {
-      max-width: 100%;
-      margin-top: 10px;
+      background-color: var(--button-hover);
     }
   </style>
 </head>
-<body>
-  <div class="container">
-    <h1>Unraid Chat Assistant</h1>
-    <label>System Instructions:</label>
-    <textarea id="instructions" rows="2" placeholder="e.g. Respond like a Linux admin..."></textarea>
-
-    <label>Your Question:</label>
-    <input type="text" id="question" placeholder="Ask something about your system..." />
-
-    <label>Optional Image (e.g. screenshot):</label>
+<body data-theme="light">
+  <header>
+    <h1>Unraid GPT Assistant</h1>
+    <button onclick="toggleTheme()">🌙</button>
+  </header>
+  <main>
+    <label for="question">Ask something about your Unraid system:</label>
+    <textarea id="question" placeholder="e.g. Why is my CPU usage high?"></textarea>
+    <label for="image">Optional: Upload a screenshot or image</label>
     <input type="file" id="image" accept="image/*" />
-
-    <button onclick="ask()">Send</button>
-
-    <pre id="response"></pre>
-    <img id="preview" class="preview-img" />
-  </div>
+    <button onclick="submitForm()">Ask</button>
+    <div id="response" class="output"></div>
+  </main>
+  <footer>
+    <small>Powered by GPT-4o • Mobile + Desktop Friendly</small>
+  </footer>
 
   <script>
-    function ask() {
+    async function submitForm() {
       const question = document.getElementById('question').value;
-      const instructions = document.getElementById('instructions').value;
-      const fileInput = document.getElementById('image');
-      const output = document.getElementById('response');
-      const preview = document.getElementById('preview');
-
-      output.textContent = '';
-      preview.src = '';
-
+      const image = document.getElementById('image').files[0];
       const formData = new FormData();
-      formData.append("question", question);
-      formData.append("instructions", instructions);
-      if (fileInput.files.length > 0) {
-        formData.append("image", fileInput.files[0]);
-        const reader = new FileReader();
-        reader.onload = () => preview.src = reader.result;
-        reader.readAsDataURL(fileInput.files[0]);
-      }
+      formData.append('question', question);
+      if (image) formData.append('image', image);
 
-      fetch("/ask/image", {
-        method: "POST",
-        body: formData
-      })
-      .then(res => res.json())
-      .then(data => {
-        output.textContent = data.response || data.error;
-      })
-      .catch(err => {
-        output.textContent = "[ERROR] " + err;
+      const res = await fetch('/ask/image', {
+        method: 'POST',
+        body: formData,
       });
+
+      const data = await res.json();
+      document.getElementById('response').innerText = data.response || data.error || 'No response';
+    }
+
+    function toggleTheme() {
+      const body = document.body;
+      const current = body.getAttribute("data-theme");
+      body.setAttribute("data-theme", current === "dark" ? "light" : "dark");
     }
   </script>
 </body>
