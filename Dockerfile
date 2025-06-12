@@ -2,11 +2,8 @@ FROM python:3.11
 
 WORKDIR /app
 
-# Install system tools required for system context gathering
 RUN apt-get update && apt-get install -y \
-    procps iproute2 net-tools \
-    sysstat lsof docker.io \
-    curl htop coreutils \
+    procps iproute2 net-tools sysstat lsof docker.io curl htop coreutils \
     && rm -rf /var/lib/apt/lists/*
 
 COPY backend/ /app/
