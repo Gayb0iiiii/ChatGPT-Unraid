@@ -19,7 +19,7 @@
     <Variable>
       <Name>INSTRUCTIONS</Name>
       <Value></Value>
-      <Description>Optional system instructions for GPT-4o (overrides default prompt)</Description>
+      <Description>Optional system instructions (not shown in UI)</Description>
       <Required>false</Required>
       <Mask>false</Mask>
     </Variable>
@@ -46,5 +46,5 @@
   <Category>Tools:System</Category>
   <Support>https://github.com/Gayb0iiiii/ChatGPT-Unraid</Support>
   <Project>https://github.com/Gayb0iiiii/ChatGPT-Unraid</Project>
-  <Description>ChatGPT-powered Unraid assistant using GPT-4o. Offers system log analysis, diagnostics, and intelligent responses. Supports image uploads, mobile UI, and customizable backend prompts.</Description>
+  <Description>ChatGPT-powered Unraid assistant. Includes system health insight, Docker container status, log analysis, image upload, dark mode UI, and GPT-4o support.</Description>
 </Container>
